@@ -1,0 +1,45 @@
+name: refresh-data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 8 * * 1-5"
+
+permissions:
+  contents: write
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch latest market data
+        run: python scripts/update.py
+
+      - name: Commit data if changed
+        run: |
+          git config user.name "data-bot"
+          git config user.email "actions@github.com"
+          git add data.json fallback-data.js
+          if git diff --cached --quiet; then
+            echo "No data change, skip commit."
+          else
+            git commit -m "data: refresh $(date +'%Y-%m-%d %H:%M')"
+            git push
+          fi
+
+      - name: Stage publish files
+        run: |
+          mkdir -p deploy
+          cp index.html data.json fallback-data.js deploy/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          publish_branch: gh-pages
+          enable_jekyll: false
+          user_name: data-bot
+          user_email: actions@github.com
