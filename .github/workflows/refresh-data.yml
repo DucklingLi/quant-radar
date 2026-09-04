@@ -1,5 +1,19 @@
-name: refresh-data
+name: daily-scan
 
+# ============================================================
+# 合并站（quant-radar）每日自动更新 + 部署 GitHub Pages
+#   · 每交易日 16:30（北京时间，即 UTC 08:30）自动运行一次
+#   · 也可在仓库 Actions 页面手动触发（Run workflow）
+# 流程：
+#   1) industry/  行业低位雷达：抓行情 -> data.json
+#   2) radar/     多因子雷达：全市场扫描打分 -> data.json
+#   3) 数据有变化则提交回 main
+#   4) 站点整体（首页 + industry/ + radar/）发布到 gh-pages
+# 站点结构：
+#   /quant-radar/             导航首页
+#   /quant-radar/industry/    行业低位雷达 · 量化行业筛选
+#   /quant-radar/radar/       多因子雷达 · 每日交易闭环
+# ============================================================
 on:
   workflow_dispatch:
   schedule:
@@ -9,30 +23,37 @@ permissions:
   contents: write
 
 jobs:
-  update-and-deploy:
+  scan-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch latest market data
-        run: python scripts/update.py
+      - name: [1/4] Industry 行业数据更新
+        run: cd industry && python scripts/update.py
 
-      - name: Commit data if changed
+      - name: [2/4] Radar 多因子全市场扫描
+        run: cd radar && python scripts/scan.py
+
+      - name: [3/4] Commit data if changed
         run: |
           git config user.name "data-bot"
           git config user.email "actions@github.com"
-          git add data.json fallback-data.js
+          git add industry/data.json industry/fallback-data.js \
+                  radar/data.json radar/fallback-data.js
           if git diff --cached --quiet; then
-            echo "No data change, skip commit."
+            echo "No data change."
           else
-            git commit -m "data: refresh $(date +'%Y-%m-%d %H:%M')"
+            git commit -m "data: scan $(date +'%Y-%m-%d %H:%M')"
             git push
           fi
 
-      - name: Stage publish files
+      - name: [4/4] Stage publish files
         run: |
-          mkdir -p deploy
-          cp index.html data.json fallback-data.js deploy/
+          rm -rf deploy
+          mkdir -p deploy/industry deploy/radar
+          cp index.html deploy/
+          cp industry/index.html industry/data.json industry/fallback-data.js deploy/industry/
+          cp radar/index.html radar/data.json radar/fallback-data.js radar/MODEL.md deploy/radar/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
