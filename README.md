@@ -1,20 +1,21 @@
-# quant-radar · 量化研究工具台
+# quant-radar · 量化研究工具台（单页整合版）
 
-一个 GitHub Pages 站点，收纳两只每日自动更新的 A 股量化研究工具。
+一个 GitHub Pages 站点、**一个页面**承载全部功能：行业位置全景（申万二级 57 细分走势/估值/龙头/基金）与个股执行清单（买点/卖出区间/止损）**同页联动**——点行业行即看详情并联动过滤下方个股，选股打分内置行业位置共振修正。
 
-| 子路径 | 系统 | 说明 |
-|---|---|---|
-| `/`（首页） | 导航入口 | 显示两个系统的数据更新时间与摘要 |
-| `/radar/` | **多因子雷达 · 每日交易闭环** | 全市场八因子扫描 → Top50 执行卡（买点/卖出区间/止损）；`MODEL.md` 为完整数学公式 |
-| `/industry/` | **行业低位雷达 · 量化行业筛选** | 申万二级 19 大类 / 57 细分，指数走势 / 估值 / 低位评估 / 龙头与基金 |
+| 路径 | 内容 |
+|---|---|
+| `/` | **行业×个股 联动台**（唯一工具页）：市场温度+建议仓位 · 今日行动 · 行业低估概况 · 57 细分全景列表（3/5 年分位条/信号/榜内计数，19 大类 + 宽基过滤）· 行业详情（走势图 日/周/月/年 + 区间/自定义回溯、低位评估、龙头股、关联基金）· 今日执行清单（行业位置徽章 + 买/卖/损全字段，行业行/行业徽章/分档 双向筛选） |
+| `/radar/live.html` | 实时盯盘（交易时段 5s 轮询 + 阈值触发提醒 + 自选） |
+| `/radar/MODEL.md` | 完整数学公式（含行业共振修正 §3g、卖出模块 §5b、验证边界 §7） |
+| `/industry/`、`/radar/` | 自动跳转回整合页（原独立工具页已合并；数据文件仍在原目录供整合页读取） |
 
 ## 目录结构
 
 ```
-index.html                        导航首页
-.github/workflows/refresh-data.yml 合并版自动更新 workflow
-industry/                         行业低位雷达（页面三件套 + industries.json + scripts/update.py）
-radar/                            多因子雷达（页面三件套 + MODEL.md + scripts/scan.py）
+index.html                        行业×个股 联动台（唯一入口页）
+.github/workflows/refresh-data.yml 每日自动更新 workflow
+industry/                         行业数据层（data.json + scripts/update.py + industries.json；index 为跳转壳）
+radar/                            个股数据层（data.json + live.html + MODEL.md + scripts/scan.py；index 为跳转壳）
 ```
 
 ## 自动更新
@@ -35,6 +36,10 @@ cd industry && python scripts/update.py     # 产出 industry/data.json
 cd radar    && python scripts/scan.py       # 产出 radar/data.json + fallback-data.js
 ```
 
-本地预览：在仓库根目录起静态服务后访问首页/radar//industry/。
+本地预览（完整功能需 http 服务，以便跨目录加载双源数据）：
+
+```bash
+python -m http.server 8000     # 访问 http://localhost:8000/
+```
 
 > 数据来源：腾讯财经公开行情接口。研究工具，不构成投资建议。

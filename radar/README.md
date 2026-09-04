@@ -57,18 +57,24 @@ python scripts/backtest_check.py   # 打分规则滚动回测（可选）
 - 换手/资金因子为 v4 新增（依赖实时快照、无历史存档，采用前瞻积累样本验证方式，尚未能历史回测）。
 - 含义：**低位启动逻辑的强区分度集中在市场冰点区**，温度越高越应减少对本榜依赖。顶部温度计给出的建议仓位与提示是第一层过滤器。榜单是量化排序而非预测，不构成投资建议。**完整数学公式见 `MODEL.md`**。
 - **启动新鲜度验证（62截面/2.7万样本）**：有低位金叉的股票未来20日平均 +4.2~4.3%（上涨占比58~59%）显著优于无金叉（+2.45%/51.6%）；刚金叉与已启动数日期望收益相当，但首启止损更近、回撤暴露更小——模型偏好早启动属风险结构优化。
+- **行业位置共振（v7，54截面/4587低位启动样本）**：行业一年低位 + 个股低位金叉 → 未来20日 **+15.08%/胜率80.6%**；行业高位 → +3.11%/55.2%（差 +11.97pp）→ 打分对低行业位共振 **+5**、高行业位 **−4**，每票输出行业一年位置徽章与本池行业画像（详见 MODEL.md §3g）。
 
 ## 五、文件结构
 
 ```
-index.html                       每日交易闭环页（温度仪表 + 今日行动 + 逐票执行卡：买点/卖出区间/止损）
-MODEL.md                         量化模型数学公式文档（全部因子/权重/回测边界）
+index.html                       每日交易闭环页 v7（温度仪表 + 行业联动 + 今日行动 + 逐票执行卡）
+live.html                        实时盯盘页（交易时段5s轮询行情 + 状态机阈值触发提醒 + 自选）
+MODEL.md                         量化模型数学公式文档（全部因子/权重/行业联动/回测边界）
 data.json                        当日扫描结果（scan.py 生成）
 fallback-data.js                 兜底数据
-scripts/scan.py                  全市场扫描+打分（每日自动运行）
+scripts/scan.py                  全市场扫描+打分（每日自动运行；v7 输出行业位置/inds 供行业联动）
 scripts/backtest_check.py        打分规则滚动回测
+scripts/backtest_launch.py       金叉新鲜度验证回测（62截面/2.7万样本）
+scripts/backtest_indpos.py       行业位置共振回测（v7 新增）
 scripts/build_industry_map.py    重建股票-申万二级行业映射（低频）
 scripts/data/sw2_boards.json     124个申万二级板块清单
 scripts/data/industry_map.json   约4577只股票->申万二级行业归属
-.github/workflows/refresh-data.yml  自动更新+部署
+.github/workflows/refresh-data.yml  自动更新+部署（合并站位于仓库根 workflow）
 ```
+
+> 注：本目录现为合并站 `quant-radar` 的 `radar/` 子目录（仓库根目录 workflow 负责 industry/ 与 radar/ 两个系统的每日自动更新与 gh-pages 发布）。部署整体说明见仓库根 README。

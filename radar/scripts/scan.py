@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-A股多因子雷达 · 每日全市场扫描器（v4：温度调制 + 板块冷区激活 + 换手/资金因子）
+A股多因子雷达 · 每日全市场扫描器（v7：行业联动——每票输出行业一年位置 + 本池行业画像 + 行业共振修正）
 ==============================================================================
 全流程：
   全A快照(4599) → hs300日K→算市场温度 heat
     → 粗筛(ST/退市/低成交/亏损剔除) → 个股320根日K(pos/fix/vol/ret60)
     → 行业归属(124申万二级) + 行业整体法PE估值中性
-    → 板块60日动量(冷区激活) + 快照因子(换手/主力资金/成交额)
-    → 温度调制打分 → Top50 输出
+    → 板块330根日K画像(一年位置 pos / 20日·60日动量) + 快照因子(换手/主力资金/成交额)
+    → 温度调制打分 + 行业共振修正(可选) → Top50 输出(含 indPos/inds 行业联动字段)
 
 打分公式见 MODEL.md：
-  Score = Σ_i w_i(heat)·S_i ，i ∈ {位置,估值,修复,板块,换手,资金,波动,流动}
-  S_i 均为候选池内 0~100 分（低波动/低估值取反分位；修复为分段函数）
+  Score = Σ_i w_i(heat)·S_i + Adj(ind) ，i ∈ {位置,估值,启动,板块,换手,资金,波动,流动}
+  S_i 均为候选池内 0~100 分（低波动/低估值取反分位；启动为分段函数）
   板块权重 w_ind = 0.14·I(heat<34)；非冷区板块不参与打分
+  Adj(ind)：行业一年位置共振修正（RES_IND_LOW/RES_IND_HIGH，由回测校准）
 
 用法: python scan.py
 产物: data.json + fallback-data.js
@@ -40,6 +41,11 @@ SLEEP = 0.1
 W_BASE = {"pos": 0.20, "value": 0.12, "fix": 0.18,
           "turn": 0.09, "fund": 0.13, "vol": 0.08, "liquid": 0.20}
 W_IND_COLD = 0.14          # 冷区板块激活权重
+
+# 行业位置共振修正（v7，数值由 backtest_indpos.py 校准：
+#   行业低位+低位启动 +15.08%/80.6% vs 行业高位 +3.11%/55.2%，差 +11.97pp(54截面/4587样本)）
+RES_IND_LOW = 5.0           # 行业处一年低位(<35%) + 个股近期低位金叉(<=7日)：加分
+RES_IND_HIGH = -4.0         # 行业处一年高位(>65%)：减分（高位行业内个股启动胜率显著偏低）
 
 
 def get(url, timeout=15, enc="utf-8"):
@@ -183,6 +189,21 @@ def turnover_score(hsl):
     if hsl <= 6:
         return 90.0
     return 55.0
+
+
+def ind_res_adj(it):
+    """行业位置共振修正（v7）。在综合分上做小幅度加减：
+      行业处一年低位区 + 个股近期低位金叉 → 行业底部共振确认（左侧更安全）；
+      行业处一年高位区 → 谨防行业见顶回落拖累（无论个股分位）。
+    数值取 backtest_indpos 的结论（RES_IND_LOW / RES_IND_HIGH），0 即不启用。"""
+    ip = it["f"].get("ind_pos")
+    if ip is None:
+        return 0.0
+    if ip <= 0.35 and it["f"].get("launch_d") is not None and it["f"]["launch_d"] <= 7:
+        return RES_IND_LOW
+    if ip >= 0.65:
+        return RES_IND_HIGH
+    return 0.0
 
 
 def pct_score(vals):
@@ -349,23 +370,38 @@ def main():
         else:
             it["fund_raw"] = None
 
-    # ---- 板块动量（冷区才参与打分，但始终计算供展示） ----
+    # ---- 板块画像（一年位置 + 20/60日动量；动量仅冷区参与打分，画像始终计算供展示/联动） ----
     nl = sorted(need)
-    print("[4/8] board momentum (%d boards) ..." % len(nl))
-    board_ret60 = {}
+    print("[4/8] board profile (%d boards) ..." % len(nl))
+    board_info = {}
     for b in nl:
         try:
-            d = fetch_day(b, 130)
-            if len(d) >= 65:
+            d = fetch_day(b, 330)
+            if len(d) >= 270:
                 closes = [c for _, c in d]
-                board_ret60[b] = (closes[-1] / closes[-61] - 1) * 100
+                win = closes[-260:]
+                hi, lo = max(win), min(win)
+                last = closes[-1]
+                pos = (last - lo) / (hi - lo) if hi > lo else 0.5   # 行业一年位置 0~1（0=接近一年低点）
+                board_info[b] = {
+                    "m60": (last / closes[-61] - 1) * 100,
+                    "m20": (last / closes[-21] - 1) * 100,
+                    "pos": pos}
         except Exception:
             pass
         time.sleep(SLEEP)
     for it in pool:
-        ir60 = board_ret60.get(it["board_code"])
-        it["f"]["ind_raw"] = ir60 if ir60 is not None else 0.0
-        it["f"]["rel_raw"] = (it["f"]["ret60"] - ir60) if ir60 is not None else 0.0
+        bi = board_info.get(it["board_code"])
+        if bi:
+            it["f"]["ind_raw"] = bi["m60"]
+            it["f"]["rel_raw"] = it["f"]["ret60"] - bi["m60"]
+            it["f"]["ind_pos"] = bi["pos"]          # 行业一年位置（个股所属行业）
+            it["f"]["ind20"] = bi["m20"]            # 行业近20日动量
+        else:
+            it["f"]["ind_raw"] = 0.0
+            it["f"]["rel_raw"] = 0.0
+            it["f"]["ind_pos"] = None
+            it["f"]["ind20"] = None
 
     # ---- 打分（权重随温度） ----
     print("[5/8] scoring (cold=%s) ..." % cold)
@@ -395,10 +431,11 @@ def main():
         it["score_t"] = sturn[i]
         it["score_g"] = sfund[i]
         it["score_ind"] = round(0.5 * sind[i] + 0.5 * srel[i], 1)
-        it["score"] = round(
-            w["pos"] * sp[i] + w["value"] * sv[i] + w["fix"] * it["score_f"]
-            + w["ind"] * it["score_ind"] + w["turn"] * sturn[i]
-            + w["fund"] * sfund[i] + w["vol"] * svo[i] + w["liquid"] * sl[i], 1)
+        base = (w["pos"] * sp[i] + w["value"] * sv[i] + w["fix"] * it["score_f"]
+                + w["ind"] * it["score_ind"] + w["turn"] * sturn[i]
+                + w["fund"] * sfund[i] + w["vol"] * svo[i] + w["liquid"] * sl[i])
+        it["adj"] = round(ind_res_adj(it), 1)
+        it["score"] = round(base + it["adj"], 1)     # 综合分 = 八因子加权 + 行业共振修正
     pool.sort(key=lambda a: -a["score"])
 
     # ---- 输出 ----
@@ -464,13 +501,48 @@ def main():
             "pe": pe, "liquid": it["liquid_raw"], "pos": pos_pct,
             "hsl": it["hsl_raw"], "fund": it["fund_raw"],
             "launch": it["f"]["launch_d"],
-            "ind60": round(it["f"]["ind_raw"], 1), "score": sc,
+            "ind60": round(it["f"]["ind_raw"], 1),
+            "indPos": round(it["f"]["ind_pos"] * 100, 1) if it["f"]["ind_pos"] is not None else None,
+            "ind20": round(it["f"]["ind20"], 1) if it["f"]["ind20"] is not None else None,
+            "score": sc, "adj": it["adj"],
             "f": {"pos": it["score_p"], "value": it["score_v"], "fix": it["score_f"],
                   "ind": it["score_ind"], "turn": it["score_t"], "fund": it["score_g"],
                   "vol": it["score_o"], "liquid": it["score_l"]},
             "sell": sell,
             "tag": tag,
         })
+    # ---- 本池行业画像（供页面"行业↔个股联动"） ----
+    inds = {}
+    for it in pool:
+        name = it["ind"]
+        if name in ("其他", "?"):
+            continue
+        d = inds.setdefault(name, {"name": name, "n": 0, "pos": 0.0, "m60": 0.0,
+                                   "m20": 0.0, "nLaunch": 0, "scores": []})
+        d["n"] += 1
+        p = it["f"].get("ind_pos")
+        if p is not None:
+            d["pos"] += p
+        m = it["f"].get("ind_raw")
+        if m is not None:
+            d["m60"] += m
+        ld = it["f"].get("launch_d")
+        if ld is not None and ld <= 7:
+            d["nLaunch"] += 1
+        d["scores"].append(it["score"])
+    ind_list = []
+    for name, d in inds.items():
+        if d["n"] < 2:
+            continue
+        ind_list.append({
+            "name": name,
+            "n": d["n"],
+            "pos": round(d["pos"] / d["n"] * 100, 1),        # 行业一年位置 %（越低=行业越近一年低点）
+            "m60": round(d["m60"] / d["n"], 1),
+            "nLaunch": d["nLaunch"],
+            "avgScore": round(sum(d["scores"]) / len(d["scores"]), 1),
+        })
+    ind_list.sort(key=lambda a: a["pos"])
     data = {
         "generatedAt": time.strftime("%Y-%m-%d %H:%M:%S"),
         "source": "腾讯财经公开行情接口（A股全市场快照 + 日K + 申万二级板块）",
@@ -479,6 +551,8 @@ def main():
         "suggestPos": suggest_pos(temp["heat"]),
         "breadth": temp["breadth"], "idxpos": temp["idxpos"], "hs60": temp["hs60"],
         "indActive": cold, "weights": w, "weightsBase": W_BASE,
+        "indRes": {"low": RES_IND_LOW, "high": RES_IND_HIGH},
+        "inds": ind_list,
         "top": items, "pool": pool_codes,
     }
     with open(OUT_JSON, "w", encoding="utf-8") as f:
