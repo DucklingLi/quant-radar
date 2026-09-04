@@ -1,0 +1,467 @@
+{
+  "version": 3,
+  "market": {
+    "label": "宽基参考",
+    "indices": [
+      {"name": "上证指数", "code": "sh000001"},
+      {"name": "沪深300", "code": "sh000300"},
+      {"name": "中证500", "code": "sh000905"},
+      {"name": "中证1000", "code": "sh000852"},
+      {"name": "创业板指", "code": "sz399006"},
+      {"name": "恒生指数", "code": "hkHSI"}
+    ]
+  },
+  "groups": [
+    {
+      "name": "农林牧渔",
+      "subs": [
+        {"name": "养殖业", "code": "pt01801017", "leaders": [
+          {"code": "sz000876", "name": "新希望"},
+          {"code": "sz002714", "name": "牧原股份"},
+          {"code": "sz300498", "name": "温氏股份"}
+        ]},
+        {"name": "饲料", "code": "pt01801014", "leaders": [
+          {"code": "sz002311", "name": "海大集团"},
+          {"code": "sz002385", "name": "大北农"}
+        ]},
+        {"name": "种植业", "code": "pt01801016", "leaders": [
+          {"code": "sh600598", "name": "北大荒"},
+          {"code": "sh601952", "name": "苏垦农发"},
+          {"code": "sz000998", "name": "隆平高科"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sz159825", "name": "农业ETF富国", "type": "ETF"},
+        {"code": "sh516670", "name": "畜牧养殖ETF招商", "type": "ETF"},
+        {"code": "sh562900", "name": "农业ETF易方达", "type": "ETF"}
+      ]
+    },
+    {
+      "name": "食品饮料",
+      "subs": [
+        {"name": "白酒Ⅱ", "code": "pt01801125", "leaders": [
+          {"code": "sh600519", "name": "贵州茅台"},
+          {"code": "sz000858", "name": "五粮液"},
+          {"code": "sz000568", "name": "泸州老窖"}
+        ]},
+        {"name": "非白酒", "code": "pt01801126", "leaders": [
+          {"code": "sh600600", "name": "青岛啤酒"},
+          {"code": "sh600132", "name": "重庆啤酒"},
+          {"code": "sz000729", "name": "燕京啤酒"}
+        ]},
+        {"name": "饮料乳品", "code": "pt01801127", "leaders": [
+          {"code": "sh600887", "name": "伊利股份"},
+          {"code": "sh605499", "name": "东鹏饮料"},
+          {"code": "sh603156", "name": "养元饮品"}
+        ]},
+        {"name": "调味发酵品Ⅱ", "code": "pt01801129", "leaders": [
+          {"code": "sh603288", "name": "海天味业"},
+          {"code": "sh600872", "name": "中炬高新"},
+          {"code": "sh600305", "name": "恒顺醋业"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh512690", "name": "酒ETF鹏华", "type": "ETF"},
+        {"code": "sz161725", "name": "白酒基金LOF", "type": "LOF"}
+      ]
+    },
+    {
+      "name": "医药生物",
+      "subs": [
+        {"name": "化学制药", "code": "pt01801151", "leaders": [
+          {"code": "sh600276", "name": "恒瑞医药"},
+          {"code": "sh600196", "name": "复星医药"},
+          {"code": "sz000963", "name": "华东医药"}
+        ]},
+        {"name": "中药Ⅱ", "code": "pt01801155", "leaders": [
+          {"code": "sh600436", "name": "片仔癀"},
+          {"code": "sh600085", "name": "同仁堂"},
+          {"code": "sz000538", "name": "云南白药"}
+        ]},
+        {"name": "生物制品", "code": "pt01801152", "leaders": [
+          {"code": "sz000661", "name": "长春高新"},
+          {"code": "sh600161", "name": "天坛生物"},
+          {"code": "sz002252", "name": "上海莱士"}
+        ]},
+        {"name": "医疗器械", "code": "pt01801153", "leaders": [
+          {"code": "sz002223", "name": "鱼跃医疗"},
+          {"code": "sz300765", "name": "迈瑞医疗"},
+          {"code": "sh688271", "name": "联影医疗"}
+        ]},
+        {"name": "医疗服务", "code": "pt01801156", "leaders": [
+          {"code": "sh603259", "name": "药明康德"},
+          {"code": "sh600763", "name": "通策医疗"},
+          {"code": "sz300015", "name": "爱尔眼科"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh512010", "name": "医药ETF易方达", "type": "ETF"},
+        {"code": "sz159859", "name": "生物医药ETF天弘", "type": "ETF"},
+        {"code": "sh513060", "name": "恒生医疗ETF博时", "type": "QDII-ETF"}
+      ]
+    },
+    {
+      "name": "银行",
+      "subs": [
+        {"name": "国有大型银行Ⅱ", "code": "pt01801782", "leaders": [
+          {"code": "sh601398", "name": "工商银行"},
+          {"code": "sh601939", "name": "建设银行"},
+          {"code": "sh601288", "name": "农业银行"}
+        ]},
+        {"name": "股份制银行Ⅱ", "code": "pt01801783", "leaders": [
+          {"code": "sh600036", "name": "招商银行"},
+          {"code": "sh601166", "name": "兴业银行"},
+          {"code": "sz000001", "name": "平安银行"}
+        ]},
+        {"name": "城商行Ⅱ", "code": "pt01801784", "leaders": [
+          {"code": "sh600919", "name": "江苏银行"},
+          {"code": "sh601838", "name": "成都银行"},
+          {"code": "sz002142", "name": "宁波银行"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh512800", "name": "银行ETF华宝", "type": "ETF"},
+        {"code": "sh516310", "name": "银行ETF易方达", "type": "ETF"},
+        {"code": "sh501025", "name": "香港银行LOF", "type": "QDII-LOF"}
+      ]
+    },
+    {
+      "name": "非银金融",
+      "subs": [
+        {"name": "证券Ⅱ", "code": "pt01801193", "leaders": [
+          {"code": "sh600030", "name": "中信证券"},
+          {"code": "sh601688", "name": "华泰证券"},
+          {"code": "sh601211", "name": "国泰海通"}
+        ]},
+        {"name": "保险Ⅱ", "code": "pt01801194", "leaders": [
+          {"code": "sh601318", "name": "中国平安"},
+          {"code": "sh601628", "name": "中国人寿"},
+          {"code": "sh601336", "name": "新华保险"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh512000", "name": "券商ETF华宝", "type": "ETF"},
+        {"code": "sh512070", "name": "证券保险ETF易方达", "type": "ETF"},
+        {"code": "sh513090", "name": "香港证券ETF易方达", "type": "QDII-ETF"}
+      ]
+    },
+    {
+      "name": "电子",
+      "subs": [
+        {"name": "半导体", "code": "pt01801081", "leaders": [
+          {"code": "sz002371", "name": "北方华创"},
+          {"code": "sh603501", "name": "韦尔股份"},
+          {"code": "sh600584", "name": "长电科技"}
+        ]},
+        {"name": "消费电子", "code": "pt01801085", "leaders": [
+          {"code": "sz002475", "name": "立讯精密"},
+          {"code": "sz002241", "name": "歌尔股份"},
+          {"code": "sz000725", "name": "京东方A"}
+        ]},
+        {"name": "光学光电子", "code": "pt01801084", "leaders": [
+          {"code": "sz000725", "name": "京东方A"},
+          {"code": "sz000100", "name": "TCL科技"},
+          {"code": "sh600703", "name": "三安光电"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh512480", "name": "半导体ETF国联安", "type": "ETF"},
+        {"code": "sh588170", "name": "科创半导体ETF华夏", "type": "ETF"},
+        {"code": "sz159327", "name": "半导体设备ETF万家", "type": "ETF"}
+      ]
+    },
+    {
+      "name": "计算机",
+      "subs": [
+        {"name": "软件开发", "code": "pt01801104", "leaders": [
+          {"code": "sh600570", "name": "恒生电子"},
+          {"code": "sh600588", "name": "用友网络"},
+          {"code": "sh688111", "name": "金山办公"}
+        ]},
+        {"name": "IT服务Ⅱ", "code": "pt01801103", "leaders": [
+          {"code": "sh600845", "name": "宝信软件"},
+          {"code": "sz000034", "name": "神州数码"}
+        ]},
+        {"name": "计算机设备", "code": "pt01801101", "leaders": [
+          {"code": "sh603019", "name": "中科曙光"},
+          {"code": "sz000977", "name": "浪潮信息"},
+          {"code": "sz002180", "name": "纳思达"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sz159998", "name": "计算机ETF天弘", "type": "ETF"},
+        {"code": "sh512720", "name": "计算机ETF国泰", "type": "ETF"}
+      ]
+    },
+    {
+      "name": "通信",
+      "subs": [
+        {"name": "通信设备", "code": "pt01801102", "leaders": [
+          {"code": "sz000063", "name": "中兴通讯"},
+          {"code": "sh600498", "name": "烽火通信"}
+        ]},
+        {"name": "通信服务", "code": "pt01801223", "leaders": [
+          {"code": "sh600941", "name": "中国移动"},
+          {"code": "sh601728", "name": "中国电信"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sz159583", "name": "通信ETF富国", "type": "ETF"},
+        {"code": "sh515880", "name": "通信ETF国泰", "type": "ETF"},
+        {"code": "sz159811", "name": "5GETF博时", "type": "ETF"}
+      ]
+    },
+    {
+      "name": "电力设备",
+      "subs": [
+        {"name": "电池", "code": "pt01801737", "leaders": [
+          {"code": "sz300750", "name": "宁德时代"},
+          {"code": "sz002074", "name": "国轩高科"},
+          {"code": "sz300014", "name": "亿纬锂能"}
+        ]},
+        {"name": "光伏设备", "code": "pt01801735", "leaders": [
+          {"code": "sh601012", "name": "隆基绿能"},
+          {"code": "sh600438", "name": "通威股份"},
+          {"code": "sz300274", "name": "阳光电源"}
+        ]},
+        {"name": "风电设备", "code": "pt01801736", "leaders": [
+          {"code": "sh601615", "name": "明阳智能"},
+          {"code": "sz002202", "name": "金风科技"}
+        ]},
+        {"name": "电网设备", "code": "pt01801738", "leaders": [
+          {"code": "sh600406", "name": "国电南瑞"},
+          {"code": "sh600089", "name": "特变电工"},
+          {"code": "sz002028", "name": "思源电气"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh515790", "name": "光伏ETF华泰柏瑞", "type": "ETF"},
+        {"code": "sz159840", "name": "锂电池ETF工银", "type": "ETF"},
+        {"code": "sh560390", "name": "电网设备ETF易方达", "type": "ETF"}
+      ]
+    },
+    {
+      "name": "汽车",
+      "subs": [
+        {"name": "乘用车", "code": "pt01801095", "leaders": [
+          {"code": "sh601633", "name": "长城汽车"},
+          {"code": "sh600104", "name": "上汽集团"},
+          {"code": "sz002594", "name": "比亚迪"}
+        ]},
+        {"name": "汽车零部件", "code": "pt01801093", "leaders": [
+          {"code": "sh600660", "name": "福耀玻璃"},
+          {"code": "sh600741", "name": "华域汽车"},
+          {"code": "sh601799", "name": "星宇股份"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sz159512", "name": "汽车ETF广发", "type": "ETF"},
+        {"code": "sh516110", "name": "汽车ETF国泰", "type": "ETF"},
+        {"code": "sh515250", "name": "智能汽车ETF富国", "type": "ETF"}
+      ]
+    },
+    {
+      "name": "国防军工",
+      "subs": [
+        {"name": "航天装备Ⅱ", "code": "pt01801741", "leaders": [
+          {"code": "sh600118", "name": "中国卫星"},
+          {"code": "sh600879", "name": "航天电子"}
+        ]},
+        {"name": "航空装备Ⅱ", "code": "pt01801742", "leaders": [
+          {"code": "sh600760", "name": "中航沈飞"},
+          {"code": "sh600893", "name": "航发动力"},
+          {"code": "sz000768", "name": "中航西飞"}
+        ]},
+        {"name": "军工电子Ⅱ", "code": "pt01801745", "leaders": [
+          {"code": "sz002179", "name": "中航光电"},
+          {"code": "sz000733", "name": "振华科技"},
+          {"code": "sz002049", "name": "紫光国微"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh512660", "name": "军工ETF国泰", "type": "ETF"},
+        {"code": "sh512710", "name": "军工龙头ETF富国", "type": "ETF"}
+      ]
+    },
+    {
+      "name": "有色金属",
+      "subs": [
+        {"name": "工业金属", "code": "pt01801055", "leaders": [
+          {"code": "sh601899", "name": "紫金矿业"},
+          {"code": "sh600362", "name": "江西铜业"},
+          {"code": "sz000807", "name": "云铝股份"}
+        ]},
+        {"name": "贵金属", "code": "pt01801053", "leaders": [
+          {"code": "sh600547", "name": "山东黄金"},
+          {"code": "sh600489", "name": "中金黄金"},
+          {"code": "sh600988", "name": "赤峰黄金"}
+        ]},
+        {"name": "小金属", "code": "pt01801054", "leaders": [
+          {"code": "sh600111", "name": "北方稀土"},
+          {"code": "sh600549", "name": "厦门钨业"}
+        ]},
+        {"name": "能源金属", "code": "pt01801056", "leaders": [
+          {"code": "sh603799", "name": "华友钴业"},
+          {"code": "sz002460", "name": "赣锋锂业"},
+          {"code": "sz002466", "name": "天齐锂业"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh512400", "name": "有色金属ETF南方", "type": "ETF"},
+        {"code": "sh516650", "name": "有色金属ETF华夏", "type": "ETF"}
+      ]
+    },
+    {
+      "name": "煤炭钢铁",
+      "subs": [
+        {"name": "煤炭开采", "code": "pt01801951", "leaders": [
+          {"code": "sh601088", "name": "中国神华"},
+          {"code": "sh601225", "name": "陕西煤业"},
+          {"code": "sh600188", "name": "兖矿能源"}
+        ]},
+        {"name": "焦炭Ⅱ", "code": "pt01801952", "leaders": [
+          {"code": "sz000723", "name": "美锦能源"},
+          {"code": "sh601015", "name": "陕西黑猫"}
+        ]},
+        {"name": "普钢", "code": "pt01801044", "leaders": [
+          {"code": "sh600019", "name": "宝钢股份"},
+          {"code": "sz000932", "name": "华菱钢铁"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh515220", "name": "煤炭ETF国泰", "type": "ETF"},
+        {"code": "sz168203", "name": "钢铁LOF", "type": "LOF"}
+      ]
+    },
+    {
+      "name": "房地产·建材",
+      "subs": [
+        {"name": "房地产开发", "code": "pt01801181", "leaders": [
+          {"code": "sh600048", "name": "保利发展"},
+          {"code": "sz001979", "name": "招商蛇口"},
+          {"code": "sz000002", "name": "万科A"}
+        ]},
+        {"name": "水泥", "code": "pt01801711", "leaders": [
+          {"code": "sh600585", "name": "海螺水泥"},
+          {"code": "sh600801", "name": "华新水泥"}
+        ]},
+        {"name": "玻璃玻纤", "code": "pt01801712", "leaders": [
+          {"code": "sh600176", "name": "中国巨石"},
+          {"code": "sh601636", "name": "旗滨集团"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh512200", "name": "房地产ETF南方", "type": "ETF"},
+        {"code": "sh515060", "name": "房地产ETF华夏", "type": "ETF"}
+      ]
+    },
+    {
+      "name": "家用电器",
+      "subs": [
+        {"name": "白色家电", "code": "pt01801111", "leaders": [
+          {"code": "sh600690", "name": "海尔智家"},
+          {"code": "sz000333", "name": "美的集团"},
+          {"code": "sz000651", "name": "格力电器"}
+        ]},
+        {"name": "小家电", "code": "pt01801113", "leaders": [
+          {"code": "sz002032", "name": "苏泊尔"},
+          {"code": "sh603486", "name": "科沃斯"},
+          {"code": "sz002242", "name": "九阳股份"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sz159996", "name": "家电ETF国泰", "type": "ETF"},
+        {"code": "sh561120", "name": "家电ETF富国", "type": "ETF"}
+      ]
+    },
+    {
+      "name": "交运公用",
+      "subs": [
+        {"name": "航运港口", "code": "pt01801992", "leaders": [
+          {"code": "sh601919", "name": "中远海控"},
+          {"code": "sh601872", "name": "招商轮船"}
+        ]},
+        {"name": "航空机场", "code": "pt01801991", "leaders": [
+          {"code": "sh601111", "name": "中国国航"},
+          {"code": "sh600009", "name": "上海机场"}
+        ]},
+        {"name": "物流", "code": "pt01801178", "leaders": [
+          {"code": "sz002352", "name": "顺丰控股"},
+          {"code": "sh600057", "name": "厦门象屿"}
+        ]},
+        {"name": "电力", "code": "pt01801161", "leaders": [
+          {"code": "sh600900", "name": "长江电力"},
+          {"code": "sh600025", "name": "华能水电"},
+          {"code": "sh601985", "name": "中国核电"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh516910", "name": "物流ETF富国", "type": "ETF"},
+        {"code": "sh516530", "name": "物流ETF银华", "type": "ETF"},
+        {"code": "sz159611", "name": "电力ETF广发", "type": "ETF"}
+      ]
+    },
+    {
+      "name": "传媒",
+      "subs": [
+        {"name": "游戏Ⅱ", "code": "pt01801764", "leaders": [
+          {"code": "sz002555", "name": "三七互娱"},
+          {"code": "sz002602", "name": "世纪华通"},
+          {"code": "sz002517", "name": "恺英网络"}
+        ]},
+        {"name": "影视院线", "code": "pt01801766", "leaders": [
+          {"code": "sh600977", "name": "中国电影"},
+          {"code": "sz002739", "name": "万达电影"},
+          {"code": "sz300251", "name": "光线传媒"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh512980", "name": "传媒ETF广发", "type": "ETF"},
+        {"code": "sz159805", "name": "传媒ETF鹏华", "type": "ETF"},
+        {"code": "sh513180", "name": "恒生科技ETF华夏", "type": "QDII-ETF"}
+      ]
+    },
+    {
+      "name": "机械设备",
+      "subs": [
+        {"name": "工程机械", "code": "pt01801077", "leaders": [
+          {"code": "sh600031", "name": "三一重工"},
+          {"code": "sz000425", "name": "徐工机械"},
+          {"code": "sz000157", "name": "中联重科"}
+        ]},
+        {"name": "自动化设备", "code": "pt01801078", "leaders": [
+          {"code": "sz002747", "name": "埃斯顿"},
+          {"code": "sz300124", "name": "汇川技术"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh560280", "name": "工程机械ETF广发", "type": "ETF"},
+        {"code": "sz159272", "name": "机器人ETF富国", "type": "ETF"}
+      ]
+    },
+    {
+      "name": "基础化工",
+      "subs": [
+        {"name": "化学原料", "code": "pt01801033", "leaders": [
+          {"code": "sh600309", "name": "万华化学"},
+          {"code": "sh600426", "name": "华鲁恒升"},
+          {"code": "sh600989", "name": "宝丰能源"}
+        ]},
+        {"name": "化学制品", "code": "pt01801034", "leaders": [
+          {"code": "sz002648", "name": "卫星化学"},
+          {"code": "sz002601", "name": "龙佰集团"},
+          {"code": "sz002001", "name": "新和成"}
+        ]},
+        {"name": "农化制品", "code": "pt01801038", "leaders": [
+          {"code": "sh600486", "name": "扬农化工"},
+          {"code": "sh600096", "name": "云天化"},
+          {"code": "sz000902", "name": "新洋丰"}
+        ]}
+      ],
+      "funds": [
+        {"code": "sh516120", "name": "化工ETF富国", "type": "ETF"},
+        {"code": "sz159870", "name": "化工ETF鹏华", "type": "ETF"}
+      ]
+    }
+  ]
+}
