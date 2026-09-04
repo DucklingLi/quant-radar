@@ -28,13 +28,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: [1/4] Industry 行业数据更新
+      - name: "Step 1/4: industry data update"
         run: cd industry && python scripts/update.py
 
-      - name: [2/4] Radar 多因子全市场扫描
+      - name: "Step 2/4: radar full-market scan"
         run: cd radar && python scripts/scan.py
 
-      - name: [3/4] Commit data if changed
+      - name: "Step 3/4: commit data if changed"
         run: |
           git config user.name "data-bot"
           git config user.email "actions@github.com"
@@ -47,7 +47,7 @@ jobs:
             git push
           fi
 
-      - name: [4/4] Stage publish files
+      - name: "Step 4/4: stage publish files"
         run: |
           rm -rf deploy
           mkdir -p deploy/industry deploy/radar
