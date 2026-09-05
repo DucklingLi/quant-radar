@@ -346,8 +346,8 @@ function importBook(){
     var rd=new FileReader();
     rd.onload=function(){ try{
       var o=JSON.parse(rd.result);
-      if(o&&typeof o==='object'&&(o.positions||Array.isArray(o))){ BK=scrubBook(o); }
-      else if(Array.isArray(o)){ BK=scrubBook({cash:556.2,positions:o,trades:[]}); }
+      if(Array.isArray(o)){ BK=scrubBook({cash:556.2,positions:o,trades:[]}); }            // 纯持仓数组（导入文件为此格式）
+      else if(o&&typeof o==='object'&&Array.isArray(o.positions)){ BK=scrubBook(o); }      // 完整账本对象（导出/备份格式）
       else throw 0;
       saveBK(); renderAll(); refreshQuotes(); alert('导入完成：'+BK.positions.length+' 笔持仓 / 现金 ¥'+BK.cash.toFixed(2)+'（无效条目已自动跳过）'); }
       catch(e){ alert('文件格式不对'); } };
