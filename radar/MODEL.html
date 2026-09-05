@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>量化模型说明 · 公式文档 · 交易驾驶舱</title>
+<style>
+:root{
+  --bg:#F1ECE2; --card:rgba(255,255,255,.8); --card2:#F7F4EC; --line:rgba(94,84,66,.11); --line2:rgba(94,84,66,.07);
+  --ink:#2E2A25; --sub:#6E675C; --mut:#A39B8D;
+  --red:#C0564B; --redbg:rgba(192,86,75,.09);
+  --green:#5E8B6E; --blue:#5F7FA6; --bluebg:rgba(95,127,166,.09);
+  --amber:#C99B4A; --amberbg:rgba(201,155,74,.12);
+  --purple:#7C6E93; --purplebg:rgba(138,124,156,.12);
+  --a1:#C0564B; --a2:#D9A441; --a3:#5F7FA6; --a4:#8FA987; --a5:#6B5E4F;
+  --sh:0 1px 2px rgba(70,60,40,.05),0 12px 34px -16px rgba(70,60,40,.22);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:14.5px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(760px 420px at 92% -110px,rgba(143,169,135,.17),transparent 60%),radial-gradient(600px 360px at -4% 12%,rgba(95,127,166,.11),transparent 58%);background-attachment:fixed}
+.num{font-variant-numeric:tabular-nums}
+a{color:var(--blue);text-decoration:none}
+#hdr{position:sticky;top:0;z-index:60;background:rgba(241,236,226,.86);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding:9px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#hdr .mark{width:32px;height:32px;flex:none;border-radius:10px;background:linear-gradient(135deg,#C0564B 0 34%,#E9E2D2 34% 60%,#5F7FA6 60% 100%);box-shadow:0 3px 9px rgba(192,86,75,.22);position:relative;overflow:hidden}
+#hdr .mark::after{content:"";position:absolute;left:60%;top:0;bottom:60%;width:40%;background:#E9E2D2}
+#hdr h1{font-size:16px;font-weight:800;letter-spacing:.3px}
+#hdr .ver{font-size:10px;font-weight:700;color:var(--mut);background:var(--card2);border:1px solid var(--line);padding:2px 9px;border-radius:999px}
+#hdr .rt{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font-family:inherit;border:1px solid var(--line);background:#fff;border-radius:10px;padding:5px 13px;font-size:12.5px;cursor:pointer;color:var(--sub);font-weight:600;transition:all .15s}
+button:hover{color:var(--blue);border-color:rgba(95,127,166,.5);transform:translateY(-.5px)}
+.page{max-width:920px;margin:0 auto;padding:20px 22px 60px}
+nav.ch{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 4px}
+nav.ch a{font-size:11.5px;font-weight:700;color:var(--sub);border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 12px;transition:all .13s}
+nav.ch a:hover{color:var(--blue);border-color:rgba(95,127,166,.5)}
+.hero{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);backdrop-filter:blur(12px);padding:22px 24px;margin-top:14px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.hero .sq{width:54px;height:54px;flex:none;border-radius:14px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;padding:2px;background:#E9E2D2}
+.hero .sq i{display:block;border-radius:6px}
+.hero .sq i:nth-child(1){background:var(--a1)}.hero .sq i:nth-child(4){background:var(--a3)}
+.hero h2{font-size:19px;font-weight:800;line-height:1.3}
+.hero p{font-size:12.5px;color:var(--mut);margin-top:3px}
+section.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);backdrop-filter:blur(12px);margin-top:16px;overflow:hidden}
+.card-h{display:flex;align-items:center;gap:10px;padding:14px 22px 10px;flex-wrap:wrap}
+.card-h .no{font-size:11px;font-weight:800;letter-spacing:.5px;border-radius:7px;padding:3px 10px;color:#fff;flex:none}
+.card-h h3{font-size:16.5px;font-weight:800;letter-spacing:.2px}
+.card-h .tag{font-size:10.5px;font-weight:700;color:var(--mut);background:var(--card2);border:1px solid var(--line);padding:2px 9px;border-radius:999px}
+.card-h .rt{margin-left:auto;font-size:10.5px;color:var(--mut)}
+.card-b{padding:8px 24px 18px}
+.card-b p{margin:8px 0;font-size:14px;color:#3A352E}
+.card-b li{margin:4px 0 4px 2px}
+.formula{background:#FAF6EB;border:1px solid #E4DBC4;border-left:4px solid var(--a2);border-radius:10px;padding:12px 16px;font:12.8px/1.85 var(--mono);white-space:pre;overflow-x:auto;color:#33301f;margin:10px 0}
+.formula .c{color:var(--mut);font-style:italic}
+table.doc{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;margin:10px 0}
+.doc thead th{background:#F0EBE0;font-size:11px;color:var(--mut);font-weight:800;padding:7px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+.doc thead th:first-child{border-radius:8px 0 0 8px}
+.doc thead th:last-child{border-radius:0 8px 8px 0}
+.doc tbody td{padding:8px 12px;border-bottom:1px solid var(--line2);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.doc tbody td:first-child,.doc tbody td:nth-child(2){text-align:left}
+.doc tbody tr:last-child td{border-bottom:0}
+.doc td b.hl{color:var(--red);font-size:13.5px}
+.doc .tag-b{display:inline-block;font-size:10.5px;font-weight:700;border-radius:7px;padding:1px 8px}
+.t-red{background:var(--redbg);color:var(--red)} .t-yel{background:var(--amberbg);color:#A67B2E}
+.t-blu{background:var(--bluebg);color:var(--blue)} .t-grn{background:var(--greenbg);color:var(--green)} .t-ink{background:var(--card2);color:var(--sub)}
+.note-warn{background:var(--redbg);border:1px solid rgba(192,86,75,.25);border-radius:12px;padding:12px 16px;font-size:12.5px;color:#7A3A33;line-height:1.8;margin:10px 0}
+.note-warn b{color:var(--red)}
+.note-ok{background:var(--greenbg);border:1px solid rgba(94,139,110,.28);border-radius:12px;padding:12px 16px;font-size:12.5px;color:#3F5C48;line-height:1.8;margin:10px 0}
+.note-blue{background:var(--bluebg);border:1px solid rgba(95,127,166,.28);border-radius:12px;padding:12px 16px;font-size:12.5px;color:#3E5570;line-height:1.8;margin:10px 0}
+.subh{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;margin:16px 0 6px;color:var(--ink)}
+.subh::before{content:"";width:9px;height:9px;border-radius:3px;background:var(--a3);flex:none}
+.foot{text-align:center;color:var(--mut);font-size:11.5px;margin-top:26px;line-height:1.9}
+.disc{display:flex;gap:8px;align-items:flex-start;margin:14px 0 2px;font-size:12px;color:var(--sub);background:var(--amberbg);border:1px solid rgba(201,155,74,.3);border-radius:12px;padding:10px 16px}
+.disc b{color:#A67B2E}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#CCC4B2;border-radius:6px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-track{background:transparent}
+@media(max-width:640px){.page{padding:12px 12px 50px}.card-b{padding:6px 16px 14px}}
+</style>
+</head>
+<body>
+<header id="hdr">
+  <div class="mark"></div>
+  <h1>量化模型说明</h1><span class="ver">MODEL · v7 · 2026-09-05</span>
+  <div class="rt">
+    <button onclick="location.href='../index.html'">← 返回交易驾驶舱</button>
+    <a href="MODEL.md" style="border:1px solid var(--line);background:#fff;border-radius:10px;padding:5px 13px;font-size:12.5px;font-weight:600;color:var(--sub);display:inline-block">查看 Markdown 原稿</a>
+  </div>
+</header>
+
+<main class="page">
+  <nav class="ch" id="chNav">
+    <a href="#s0">总览</a><a href="#s1">候选池</a><a href="#s2">市场温度</a><a href="#s3">八因子</a><a href="#s3g">行业联动</a><a href="#s3h">质量层</a><a href="#s4">综合分</a><a href="#s5b">卖出参考</a><a href="#s6">信号档位</a><a href="#s7">回测边界</a><a href="#s8">一句话</a>
+  </nav>
+
+  <div class="hero">
+    <div class="sq"><i></i><i></i><i></i><i></i></div>
+    <div style="flex:1;min-width:280px">
+      <h2>A股多因子雷达 · 量化模型数学说明</h2>
+      <p>三层结构：市场温度 heat 连续调制 → 八因子 + 行业共振打分 → 卖出参考（价值回归 + 离场纪律）。对应 scan.py，完整代码即文档。</p>
+    </div>
+  </div>
+  <div class="disc"><span>⚠</span><div><b>诚实声明：</b>本文档是当前模型的完整数学语言描述。模型仅用于研究参考，<b>不构成投资建议</b>；回测边界见 §7——本模型的强区分度集中在市场冰点区，温度越高参考价值越低。</div></div>
+
+  <!-- 0 总览 -->
+  <section class="card" id="s0">
+    <div class="card-h"><span class="no" style="background:var(--a1)">0</span><h3>模型总览</h3><span class="tag">三层 · 连续调制 · 无策略分叉</span></div>
+    <div class="card-b">
+      <div class="formula">市场温度层  heat ∈ [0,100]   —— 连续市场状态，调制信号档位与建议仓位（不切换选股逻辑）
+因子打分层  S_i ∈ [0,100]   —— 8 个因子对候选池内每只股票打分
+综合分      Score = Σ w_i(heat)·S_i —— 加权合成 → 排序取 Top50
+卖出参考层  sell(s) = (估值状态, 卖出区间 zone, 离场线 stop) —— 价值回归 + 短线纪律（§5b）</div>
+    </div>
+  </section>
+
+  <!-- 1 候选池 -->
+  <section class="card" id="s1">
+    <div class="card-h"><span class="no" style="background:var(--a3)">1</span><h3>候选池 Universe → Pool</h3><span class="tag">全 A ≈4600 只 → 市值取前约 450 只入池打分</span></div>
+    <div class="card-b">
+      <p>记全市场 A 股集合为 U（约 4600 只，按流通市值降序拉取快照）。候选池 <b>Pool = { s ∈ U : 剔除条件全部通过 }</b>，任一命中即剔除：</p>
+      <table class="doc">
+        <thead><tr><th style="text-align:left">剔除条件</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>名称含 ST / 退</td><td>ST、退市整理</td></tr>
+          <tr><td>代码前缀</td><td>仅 sh6 / sz0 / sz3（沪深主板·创业板）</td></tr>
+          <tr><td>PE_TTM ≤ 0 或缺失</td><td><span class="tag-b t-red">剔除亏损股</span> 规避"低位+绩差=价值陷阱"</td></tr>
+          <tr><td>当日成交额 &lt; 3000 万</td><td>流动性下限</td></tr>
+          <tr><td>上市不足约 1 年</td><td>历史日K &lt; 245 根，无 260 日区间可算位置</td></tr>
+          <tr><td>近 20 日跌幅 ≤ −18%</td><td>下跌趋势未止，<b>不接飞刀</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 2 温度 -->
+  <section class="card" id="s2">
+    <div class="card-h"><span class="no" style="background:var(--a2)">2</span><h3>市场温度 heat</h3><span class="tag">连续因子 · 只调仓位与档位</span></div>
+    <div class="card-b">
+      <p>设 HS300 收盘序列 {P_t}，t 为当日：</p>
+      <div class="formula">idxpos   = (P_t − min260) / (max260 − min260) × 100           # 一年位置
+breadth  = |{ s∈U : 60日涨幅(s) &gt; 0 }| / |U| × 100         # 全A 60日上涨广度
+momScore = clamp( HS300近60日涨幅(%) + 25 , 0, 100 ) / 50 × 100  # 指数60日动量 → 0~100
+
+heat     = 0.45·idxpos + 0.30·breadth + 0.25·momScore</div>
+      <p style="font-size:13px;color:var(--sub)">min260 / max260 为近 260 交易日窗口极值；clamp 为截断函数。heat 只做两件事：</p>
+      <table class="doc">
+        <thead><tr><th style="text-align:left">用途</th><th style="text-align:left">公式 / 规则</th></tr></thead>
+        <tbody>
+          <tr><td>建议仓位</td><td>suggestPos = round( 20 + 0.45·heat ) %  →  冷 20% 起 · 热 ≤ 65%</td></tr>
+          <tr><td>信号档位</td><td>温区正常分档；冷/热区从紧且无"重点关注"（§6）</td></tr>
+          <tr><td>板块因子</td><td>仅 heat &lt; 34（cold）时激活（§4）</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:13px;color:var(--sub)">显示标签便于阅读：<span class="tag-b t-blu">cold &lt;34</span> <span class="tag-b t-yel">warm 34~66</span> <span class="tag-b t-red">hot &gt;66</span>——<b>打分公式本身不含任何 heat 分支</b>（唯一例外：板块因子冷区激活），不产生"牛熊切换"式策略分叉。</p>
+    </div>
+  </section>
+
+  <!-- 3 八因子 -->
+  <section class="card" id="s3">
+    <div class="card-h"><span class="no" style="background:var(--a4)">3</span><h3>八因子定义</h3><span class="tag">S_i ∈ [0,100] · 分位法 + 分段函数</span></div>
+    <div class="card-b">
+      <p>每只股票 s ∈ Pool 计算各因子得分。候选池内某原始量集合 X = {x_s} 的<b>分位函数</b>：</p>
+      <div class="formula">q(x_s) = ( #{ x∈X : x &lt; x_s } + ½·#{ x∈X : x = x_s } ) / |X| × 100</div>
+
+      <div class="subh">F1 · 位置因子 S_pos <span style="font-size:10px;color:var(--mut);font-weight:600">低位保护（核心）</span></div>
+      <div class="formula">pos_raw(s) = 1 − (P_s − lo260_s) / (hi260_s − lo260_s)
+S_pos = q( pos_raw )          <span class="c"># 越高=越接近一年低点；贴一年高位 → pos_raw≈0 → 低分</span></div>
+      <p style="font-size:13px;color:var(--sub)">hi260 / lo260 为个股自身 260 日区间高低。此因子从机制上杜绝把"历史高位股"推向前排。</p>
+
+      <div class="subh">F2 · 估值因子 S_val <span style="font-size:10px;color:var(--mut);font-weight:600">行业中性</span></div>
+      <div class="formula">val_raw(s) = ln( PE_s / PE_ind(s) )
+S_val = 100 − q( val_raw )    <span class="c"># 取反：相对行业越便宜分越高</span></div>
+      <p style="font-size:13px;color:var(--sub)">PE_ind 为所属申万二级板块整体法 PE。对数比使跨行业可比（银行 5 倍 vs 医药 30 倍不被直接比较）。</p>
+
+      <div class="subh">F3 · 启动因子 S_launch <span style="font-size:10px;color:var(--mut);font-weight:600">低位刚金叉首启确认 · 2026-09-04 由"修复因子"升级</span></div>
+      <p>设 MA5、MA20 序列与 MACD（DIF=EMA12−EMA26，DEA=EMA9(DIF)），定义<b>低位金叉</b>：</p>
+      <div class="formula">金叉日 j：(MA5_j&gt;MA20_j ∧ MA5_{j−1}≤MA20_{j−1}) 或 (DIF_j&gt;DEA_j ∧ DIF_{j−1}≤DEA_{j−1})
+          且 金叉日价格在一年区间内的位置 &lt; 0.70（排除高位诱多金叉）
+d = 距最近一次低位金叉的天数 = min{均线金叉, MACD金叉}；120 日内无金叉则 d = ∞</div>
+      <p>启动分（r20 = 近 20 日涨幅 %）：</p>
+      <div class="formula">S_launch(r20,d) =  5  若 r20 &gt; +25 或 r20 &lt; −18     <span class="c"># 过热/崩跌未止，一律不碰</span>
+                 98  若 d ≤ 3                          <span class="c"># 首启甜点：刚金叉 1~3 日</span>
+                 86  若 d ≤ 7                          <span class="c"># 早启</span>
+                 64  若 d ≤ 15
+                 48  若 d ≤ 30
+                 42  若无近期金叉但 −5 ≤ r20 ≤ 12      <span class="c"># 仅企稳</span>
+                 18  其它</div>
+      <div class="note-blue"><b>验证（62 截面 · 2.7 万样本 · 未来20日）</b>：有低位金叉平均 <b>+4.2~4.3%</b>（上涨占比 58~59%），无金叉仅 <b>+2.45% / 51.6%</b> —— "启动状态"是分水岭；刚金叉(≤3日)与已启动(8~30日)期望收益几乎无差（+4.29% vs +4.30%），但<b>首启止损更近、回撤暴露更小</b>。本因子偏好早启动是风险结构优化（入场点质量），不是宣称更高期望收益。</div>
+
+      <div class="subh">F4 · 板块因子 S_ind <span style="font-size:10px;color:var(--mut);font-weight:600">行业轮动 + 行业内选优 · 仅冷区激活</span></div>
+      <div class="formula">ind_ret60  = 所属申万二级板块指数近60日涨幅（%）
+rel_ret60 = 个股近60日涨幅 − ind_ret60      <span class="c"># 相对板块超额</span>
+S_ind = ½·q(ind_ret60) + ½·q(rel_ret60)</div>
+      <p style="font-size:13px;color:var(--sub)">权重仅在 cold 区非零（§4）；暖/热区该因子对总分贡献为 0（避免热区变相追涨行业）。</p>
+
+      <div class="subh">F5 · 换手因子 S_turn <span style="font-size:10px;color:var(--mut);font-weight:600">关注度舒适区</span></div>
+      <div class="formula">S_turn(h) = 10  若 h ≤ 0.2 或 h &gt; 12     <span class="c"># 无人问津 / 投机过热</span>
+            40  若 0.2 &lt; h &lt; 0.5
+            90  若 0.5 ≤ h ≤ 6           <span class="c"># 舒适活跃区</span>
+            55  若 6 &lt; h ≤ 12</div>
+
+      <div class="subh">F6 · 资金因子 S_fund <span style="font-size:10px;color:var(--mut);font-weight:600">大资金关注度</span></div>
+      <div class="formula">fund_raw(s) = ( Z5in − Z5out ) / 流通市值 × 100   <span class="c"># 近5日主力净流入占流通市值 %</span>
+S_fund = q( fund_raw )</div>
+
+      <div class="subh">F7 · 波动因子 S_vol <span style="font-size:10px;color:var(--mut);font-weight:600">低波优先</span></div>
+      <div class="formula">σ20 = 近20个交易日收益的年化波动率（%）
+S_vol = 100 − q(σ20)     <span class="c"># 低波动 → 高分</span></div>
+
+      <div class="subh">F8 · 流动性因子 S_liq</div>
+      <div class="formula">S_liq = q( 当日成交额 )   <span class="c"># 流动性越好分越高</span></div>
+    </div>
+  </section>
+
+  <!-- 3g 行业联动 -->
+  <section class="card" id="s3g">
+    <div class="card-h"><span class="no" style="background:var(--a5)">3g</span><h3>行业联动层</h3><span class="tag">v7 · 选股参考行业位置 · 共振修正经回测校准</span></div>
+    <div class="card-b">
+      <div class="formula">posInd(s) = 所属申万二级行业指数近一年区间位置 (0~1)
+           （板块 330 根日K，取近 260 交易日高低点；0=行业近一年低点 · 1=高点）
+
+Adj_ind(s) =  +5  若 posInd ≤ 0.35 且 个股距最近低位金叉 ≤ 7 日   <span class="c"># 行业底部共振</span>
+              −4  若 posInd ≥ 0.65                                  <span class="c"># 高位行业风险折价</span>
+              0   其他</div>
+      <p>校准依据（backtest_indpos.py · 54 周度截面 · 约 4587 个"低位启动"样本 · 未来 20 日）：</p>
+      <table class="doc">
+        <thead><tr><th style="text-align:left">截面时行业一年位置</th><th>样本</th><th>平均收益</th><th>上涨占比</th></tr></thead>
+        <tbody>
+          <tr><td>行业低位 (&lt;0.33)</td><td>723</td><td><b class="hl">+15.08%</b></td><td><b class="hl">80.6%</b></td></tr>
+          <tr><td>行业中位</td><td>2062</td><td>+4.37%</td><td>62.1%</td></tr>
+          <tr><td>行业高位 (&gt;0.67)</td><td>1802</td><td>+3.11%</td><td>55.2%</td></tr>
+        </tbody>
+      </table>
+      <div class="note-ok"><b>低行业位 vs 高行业位 = +11.97pp。</b>"行业趴在一年低位、个股率先低位金叉启动"（左侧行业里的右侧个股）是最优共振形态；行业已处高位后的低位启动（分化/补涨）期望显著偏低——因此本层奖励前者、折价后者。修正幅度取差分的一小部分（+5/−4），避免过度拟合。</div>
+      <p style="font-size:13px;color:var(--sub)"><b>口径边界：</b>行业位置 ≠ 行业动量；低位行业也可能持续阴跌，因此共振修正只作用于已有"个股低位金叉"确认的标的，不单独催票。</p>
+    </div>
+  </section>
+
+  <!-- 3h 质量层 -->
+  <section class="card" id="s3h">
+    <div class="card-h"><span class="no" style="background:var(--a2)">3h</span><h3>质量层（ROE/营收增速）</h3><span class="tag">v9 · 正交于位置/动量的独立增量 · 回测单调验证</span></div>
+    <div class="card-b">
+      <div class="formula">qAdj(s) =  +3  若 ROE &gt; 15 或 (ROE &gt; 10 且 营收增速 ≥ 0)   <span class="c"># 优质公司低位启动</span>
+                −2  若 0 &lt; ROE &lt; 5 或 营收增速 &lt; −10%                 <span class="c"># 微利/营收萎缩：弱质折价</span>
+                0   其余 / 无财务覆盖（不惩罚）
+Score(s) = 八因子加权 + Adj_ind(s) + qAdj(s)</div>
+      <p>校准依据（backtest_quality.py · 2025-09~2026-08 全市场 14844 个低位金叉启动事件 · 未来 20 日 · 财务取 2026-06-30 中报）：</p>
+      <table class="doc">
+        <thead><tr><th style="text-align:left">按加权 ROE 分桶</th><th>样本</th><th>平均收益</th><th>上涨占比</th></tr></thead>
+        <tbody>
+          <tr><td>亏损</td><td>4893</td><td>+0.48%</td><td>48.3%</td></tr>
+          <tr><td>0~5%</td><td>7289</td><td>+0.95%</td><td>50.6%</td></tr>
+          <tr><td>5~10%</td><td>1913</td><td>+1.51%</td><td>52.5%</td></tr>
+          <tr><td>10~15%</td><td>287</td><td>+2.28%</td><td>51.6%</td></tr>
+          <tr><td><b>&gt;15%</b></td><td>309</td><td><b class="hl">+3.62%</b></td><td><b class="hl">58.6%</b></td></tr>
+        </tbody>
+      </table>
+      <div class="note-ok"><b>ROE 分层完全单调</b>；深低位（位置≤0.33）样本内 优质(ROE&gt;10 且营收不降) <b>+6.61%/胜率62.8%</b> vs 弱质 +1.25%/53.8% —— 质量在"低位启动"里是独立增量，与"追好消息被证伪"相反，因此入打分。营收增速同向单调（&lt;−10%: +0.14% → &gt;20%: +2.28%）。修正取差分小部分（+3/−2）防过拟合。</div>
+      <p style="font-size:13px;color:var(--sub)"><b>口径边界：</b>财务按报告期披露（4/30 后一季报、8/31 后中报、10/31 后三季报自动切换）；周期股景气底部 ROE 低属正常，折价只作用于"低位启动但质地弱"的标的；东财取数失败时全部 qAdj=0，退化为 v7 口径。页面：行内绿点=背书 / 琥珀点=折价，悬浮框显示 ROE/营收明细。</p>
+    </div>
+  </section>
+
+  <!-- 4 综合分 -->
+  <section class="card" id="s4">
+    <div class="card-h"><span class="no" style="background:var(--a1)">4</span><h3>综合分</h3><span class="tag">加权合成 · 冷区权重让渡</span></div>
+    <div class="card-b">
+      <div class="formula">Score(s) = w_pos·S_pos + w_val·S_val + w_launch·S_launch + w_ind·S_ind
+          + w_turn·S_turn + w_fund·S_fund + w_vol·S_vol + w_liq·S_liq
+          + Adj_ind(s)  +  qAdj(s)            <span class="c"># v7 行业共振（§3g）+ v9 质量（§3h）</span></div>
+      <table class="doc">
+        <thead><tr><th>w_pos</th><th>w_val</th><th>w_launch</th><th>w_ind</th><th>w_turn</th><th>w_fund</th><th>w_vol</th><th>w_liq</th></tr></thead>
+        <tbody>
+          <tr><td><b>0.20</b></td><td>0.12</td><td><b>0.18</b></td><td>0（待激活）</td><td>0.09</td><td>0.13</td><td>0.08</td><td><b>0.20</b></td></tr>
+        </tbody>
+      </table>
+      <div class="formula"><span class="c"># 冷区板块激活规则（唯一的 heat 分支）</span>
+若 heat &lt; 34（cold）:   w_ind = 0.14 ；其余 w_i = w0_i × 0.86   <span class="c"># 等比收缩，保持 Σw = 1</span>
+否则:                    w_ind = 0   ；其余 w_i = w0_i           <span class="c"># Σw = 1</span></div>
+      <p style="font-size:13px;color:var(--sub)">冰点期把 14% 权重从基础因子让渡给板块动量（行业轮动冷区回测为正向增益）；暖/热期板块因子权重 0（避免行业动量在热区变相追涨）。</p>
+    </div>
+  </section>
+
+  <!-- 5 大盘 -->
+  <section class="card" id="s5" style="display:none"></section>
+
+  <!-- 5b 卖出 -->
+  <section class="card" id="s5b">
+    <div class="card-h"><span class="no" style="background:var(--a3)">5b</span><h3>卖出参考</h3><span class="tag">v5 · 价值回归 + 短线离场纪律</span></div>
+    <div class="card-b">
+      <div class="subh">估值状态与价值回归中枢</div>
+      <p>PE_ind 为<b>行业内估值中枢</b>：候选池内同行业成分 <b>PE∈(0,80]</b> 集合的下中位数（剔除 PE&gt;80 微利/困境伪高样本——实测普钢板块内一家 PE≈200 的微利股会把中位数抬高 16 倍）；行业内有效样本 &lt;2 视为无参照，不给出回归目标。</p>
+      <div class="formula">peR(s) = PE_s / PE_ind                    <span class="c"># 无参照行业不计算</span>
+
+状态 est(s) = “极低·周期特征”  若 peR &lt; 0.60   <span class="c"># 周期底部/困境股，PE 均值回归不适用</span>
+              “低估修复中”     若 0.60 ≤ peR &lt; 0.85
+              “合理”          若 0.85 ≤ peR ≤ 1.15
+              “偏高”          若 peR &gt; 1.15
+
+valC(s) = price(s) / peR(s)                   <span class="c"># 回归理论价（仅 0.60~0.85 时启用为目标）</span></div>
+
+      <div class="subh">卖出区间（分批兑现带 · 受技术阻力钳制）</div>
+      <div class="formula">修复空间 fix_up = valC − price
+若 0.60 ≤ peR &lt; 0.85 且 valC &gt; price×1.15 且 hi260 &gt; price：
+    zone = [ price + fix_up×0.55 ,  min( price + fix_up×1.05 , hi260 ) ]
+    <span class="c"># 兑现带=吃掉约 55%~105% 估值修复空间，上限不越过一年高点</span>
+否则（合理/偏高/极低/无参照）：短线分批止盈带
+    zone = [ price × 1.08 ,  min( price × 1.30 , hi260 ) ]</div>
+      <p style="font-size:13px;color:var(--sub)">hi260 = 个股近一年最高收盘价（前期套牢盘 = 技术阻力上限）。估值目标永远受此钳制——修复空间再大也不越过前高（避免"纸上目标"；曾把宝钢 5.84 元误算 22 元目标，已修正）。</p>
+
+      <div class="subh">短线离场线（止损/止盈纪律）</div>
+      <div class="formula">launchPx = 最近一次低位金叉当日的收盘价（启动平台 / 成本密集区）
+stop(s)  = min( launchPx , MA20 ) × 0.97</div>
+      <p style="font-size:13px;color:var(--sub)">跌破金叉启动平台或 20 日均线 3% 视为"启动失败/趋势走坏"，纠错离场。取两者较低者更贴近保护，避免被单日波动震出。</p>
+
+      <div class="note-warn"><b>诚实边界：</b>卖出区间是<b>分批落袋纪律</b>（进入区间即考虑逐步兑现），不是精确价格预测；估值中枢依赖行业中位 PE 的稳定性，行业景气变化会整体移动锚。数据仅公开行情，<b>无盈利预测，故不做 DCF 类"内在价值"宣称</b>。F3 解决"何时进"，本模块解决"何时出"——两者配对构成完整交易闭环。</div>
+    </div>
+  </section>
+
+  <!-- 6 档位 -->
+  <section class="card" id="s6">
+    <div class="card-h"><span class="no" style="background:var(--a2)">6</span><h3>信号档位（操作参考）</h3><span class="tag">分档标签 ≠ 买入指令</span></div>
+    <div class="card-b">
+      <div class="formula">温区（warm）：   Score ≥ 75 → “重点关注”       Score ≥ 60 → “关注”       否则 → “观察”
+冷/热区：        Score ≥ 78 → “关注”       否则 → “观察”
+               <span class="c"># 冷/热两区不出现“重点关注”，整体从严</span></div>
+      <p style="font-size:13px;color:var(--sub)">"重点关注 / 关注 / 观察"表达信号强弱排序，不是买入指令。</p>
+    </div>
+  </section>
+
+  <!-- 7 回测 -->
+  <section class="card" id="s7">
+    <div class="card-h"><span class="no" style="background:var(--a4)">7</span><h3>验证回测（诚实边界）</h3><span class="tag">近2.5年 · 54 周度截面 · 前/后 1/3 · 未来 20 日</span></div>
+    <div class="card-b">
+      <table class="doc">
+        <thead><tr><th style="text-align:left">市场温度</th><th>高分组 − 低分组</th><th>截面胜率</th></tr></thead>
+        <tbody>
+          <tr><td>冷区 heat&lt;34</td><td><b class="hl">+4.5pp</b></td><td><b class="hl">100%</b>（6 截面）</td></tr>
+          <tr><td>温区</td><td>−0.7pp</td><td>28%</td></tr>
+          <tr><td>热区 heat&gt;66</td><td>−2.0pp</td><td>39%</td></tr>
+        </tbody>
+      </table>
+      <p><b>已明确验证：</b></p>
+      <ul style="list-style:none">
+        <li>· 位置/启动/低波为主的低位逻辑，正向区分度集中在<b>市场冰点区</b>；越热越不应依赖本榜。</li>
+        <li>· 板块因子冷区正向增益；暖/热区无增量（行业动量≈追涨，与低位保护冲突）→ 设计为仅冷区激活。</li>
+        <li>· <b>行业位置共振（v7）</b>：低行业位+低位启动 <b>+15.08% / 80.6%</b> vs 高行业位 +3.11% / 55.2%（差 <b>+11.97pp</b>）→ 加 +5 / 折价 −4（§3g）。</li>
+        <li>· 早期"趋势/动量追涨"版已弃：牛市 +4.4pp 但高分组 42% 贴一年高位股，熊市 −2.8pp 反向。</li>
+      </ul>
+      <div class="note-blue"><b>尚未能历史验证（需前瞻积累）：</b>换手、资金因子依赖盘中快照字段（历史无存档），无法在旧截面回测——模型每日自动运行，样本累积后另行验证。</div>
+      <div class="note-warn"><b>方法局限：</b>候选池按今日市值选取（幸存者偏差）；截面回测未含交易成本；分桶样本数有限。以上数字均为信号层方向概率，不是可交易净值。</div>
+    </div>
+  </section>
+
+  <!-- 8 总结 -->
+  <section class="card" id="s8">
+    <div class="card-h"><span class="no" style="background:var(--a5)">8</span><h3>一句话总结</h3></div>
+    <div class="card-b">
+      <div class="formula">Score = 位置·0.20 + 估值·0.12 + <b>启动·0.18</b> + 板块·0.14·𝕀(冰点) + 换手·0.09
+      + 资金·0.13 + 波动·0.08 + 流动·0.20  [+ 行业共振 Adj_ind] [+ 质量修正 qAdj]
+
+（非冰点期板块项归 0，其余权重恢复基准）
+且整套打分只应在 heat 足够低时被认真对待 —— 温度越高，参考价值越低。</div>
+      <p style="font-size:13px;color:var(--sub);text-align:center;margin-top:8px">研究工具 · 市场有风险 · 决策需独立判断 · <a href="../index.html">返回交易驾驶舱 →</a></p>
+    </div>
+  </section>
+
+  <div class="foot">数据源：腾讯财经公开行情接口 · 本文档与 scan.py 同步维护 · 页面数据每交易日 16:30 自动更新</div>
+</main>
+</body>
+</html>

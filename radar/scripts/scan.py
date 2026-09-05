@@ -46,6 +46,11 @@ W_IND_COLD = 0.14          # 冷区板块激活权重
 #   行业低位+低位启动 +15.08%/80.6% vs 行业高位 +3.11%/55.2%，差 +11.97pp(54截面/4587样本)）
 RES_IND_LOW = 5.0           # 行业处一年低位(<35%) + 个股近期低位金叉(<=7日)：加分
 RES_IND_HIGH = -4.0         # 行业处一年高位(>65%)：减分（高位行业内个股启动胜率显著偏低）
+# 质量修正（v9：backtest_quality.py 校准——ROE 单调 亏损+0.48%/48% → >15% +3.62%/58.6%；
+# 深低位样本内 优质(ROE>10且营收不降) +6.61%/62.8% vs 弱 +1.25%/54%；与行业共振同一加法层）
+QUAL_GOOD = 3.0             # ROE>15 或 (ROE>10 且营收增速>=0)：质量背书
+QUAL_BAD = -2.0             # 微利(0<ROE<5) 或 营收增速<-10：弱质折价
+QUAL_REPORT = "auto"        # auto=按日期选最近完整披露报告期
 
 
 def get(url, timeout=15, enc="utf-8"):
@@ -204,6 +209,64 @@ def ind_res_adj(it):
     if ip >= 0.65:
         return RES_IND_HIGH
     return 0.0
+
+
+# ---------------- 质量因子（v9：ROE/营收增速，backtest_quality 校准） ----------------
+def latest_report(today):
+    """最近一个已过法定披露截止的完整报告期（YYYY-MM-DD）。
+    披露截止：年报与一季报 4/30、中报 8/31、三季报 10/31。"""
+    import datetime as _dt
+    y = today.year
+    out = None
+    for rep, dl in ((_dt.date(y - 1, 12, 31), _dt.date(y, 4, 30)),
+                    (_dt.date(y, 3, 31), _dt.date(y, 4, 30)),
+                    (_dt.date(y, 6, 30), _dt.date(y, 8, 31)),
+                    (_dt.date(y, 9, 30), _dt.date(y, 10, 31))):
+        if today >= dl:
+            out = rep
+    return (out or _dt.date(y - 1, 12, 31)).isoformat()
+
+
+def fetch_quality(report):
+    """拉某报告期全市场业绩报表（ROE/营收增速等），落盘 raw/quality_<rep>.json 供复用。"""
+    import urllib.parse
+    cache = os.path.join(ROOT, "scripts", "raw", "quality_%s.json" % report)
+    if os.path.exists(cache):
+        return json.load(open(cache, encoding="utf-8"))
+    os.makedirs(os.path.dirname(cache), exist_ok=True)
+    out, page = {}, 1
+    while page <= 14:
+        flt = urllib.parse.quote("(REPORTDATE='%s')" % report)
+        u = ("https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_LICO_FN_CPD"
+             "&columns=SECURITY_CODE,WEIGHTAVG_ROE,YSTZ,SJLTZ,XSMLL"
+             "&pageNumber=%d&pageSize=500&sortColumns=SECURITY_CODE&sortTypes=1&filter=%s" % (page, flt))
+        try:
+            raw = get(u)
+            d = json.loads(raw)
+            rows = ((d.get("result") or {}).get("data")) or []
+            for r in rows:
+                out[r["SECURITY_CODE"]] = {"roe": r.get("WEIGHTAVG_ROE"), "ystz": r.get("YSTZ")}
+            if len(rows) < 500:
+                break
+        except Exception:
+            break
+        page += 1
+        time.sleep(0.3)
+    json.dump(out, open(cache, "w", encoding="utf-8"), ensure_ascii=False)
+    return out
+
+
+def qual_score(it, qmap):
+    """质量修正与明细。返回 (adj, q) —— q=None 表示无财务覆盖（不给修正）。"""
+    code = it["x"].get("code", "")
+    q = qmap.get(code[2:]) if len(code) > 2 else None
+    if not q or q.get("roe") is None:
+        return 0.0, q
+    roe, ystz = q["roe"], q.get("ystz")
+    good = roe > 15 or (roe > 10 and (ystz is None or ystz >= 0))
+    bad = (0 < roe < 5) or (ystz is not None and ystz < -10)
+    adj = QUAL_GOOD if good else (QUAL_BAD if bad else 0.0)
+    return adj, q
 
 
 def pct_score(vals):
@@ -403,6 +466,16 @@ def main():
             it["f"]["ind_pos"] = None
             it["f"]["ind20"] = None
 
+    # ---- 质量层（v9）：拉最近完整报告期财务 → 质量修正 ----
+    import datetime as _dt
+    qrep = QUAL_REPORT if QUAL_REPORT != "auto" else latest_report(_dt.date.today())
+    qmap = fetch_quality(qrep)
+    for it in pool:
+        qadj, q = qual_score(it, qmap)
+        it["qadj"] = round(qadj, 1)
+        it["q"] = {"roe": (round(q["roe"], 2) if q and q["roe"] is not None else None),
+                   "ystz": (round(q["ystz"], 1) if q and q["ystz"] is not None else None),
+                   "adj": it["qadj"]} if q else None
     # ---- 打分（权重随温度） ----
     print("[5/8] scoring (cold=%s) ..." % cold)
     n = len(pool)
@@ -435,7 +508,7 @@ def main():
                 + w["ind"] * it["score_ind"] + w["turn"] * sturn[i]
                 + w["fund"] * sfund[i] + w["vol"] * svo[i] + w["liquid"] * sl[i])
         it["adj"] = round(ind_res_adj(it), 1)
-        it["score"] = round(base + it["adj"], 1)     # 综合分 = 八因子加权 + 行业共振修正
+        it["score"] = round(base + it["adj"] + it.get("qadj", 0.0), 1)  # 综合分 = 八因子 + 行业共振 + 质量修正
     pool.sort(key=lambda a: -a["score"])
 
     # ---- 输出 ----
@@ -504,7 +577,8 @@ def main():
             "ind60": round(it["f"]["ind_raw"], 1),
             "indPos": round(it["f"]["ind_pos"] * 100, 1) if it["f"]["ind_pos"] is not None else None,
             "ind20": round(it["f"]["ind20"], 1) if it["f"]["ind20"] is not None else None,
-            "score": sc, "adj": it["adj"],
+            "score": sc, "adj": it["adj"], "qadj": it.get("qadj", 0.0),
+            "q": it.get("q"),
             "f": {"pos": it["score_p"], "value": it["score_v"], "fix": it["score_f"],
                   "ind": it["score_ind"], "turn": it["score_t"], "fund": it["score_g"],
                   "vol": it["score_o"], "liquid": it["score_l"]},
@@ -552,6 +626,7 @@ def main():
         "breadth": temp["breadth"], "idxpos": temp["idxpos"], "hs60": temp["hs60"],
         "indActive": cold, "weights": w, "weightsBase": W_BASE,
         "indRes": {"low": RES_IND_LOW, "high": RES_IND_HIGH},
+        "qualRep": qrep, "qualRes": {"good": QUAL_GOOD, "bad": QUAL_BAD},
         "inds": ind_list,
         "top": items, "pool": pool_codes,
     }
