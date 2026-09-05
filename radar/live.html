@@ -96,6 +96,7 @@ tr:hover{background:#fbfdff}
 </style>
 </head>
 <body>
+<script>document.addEventListener("DOMContentLoaded",function(){if(location.search.indexOf("embed")>=0){var el=document.querySelector(".top");if(el)el.style.display="none";}});</script>
 <div class="top">
   <h1><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M3 17l5-6 4 3 6-8"/><path d="M15 6h4v4"/></svg>实时盯盘<span class="t">LIVE</span></h1>
   <span class="stat"><span class="dot" id="mktDot"></span>状态 <b id="mktState">—</b></span>
@@ -284,9 +285,10 @@ function showRow(r){
   var chip=q?'<span class="stg '+sgCls+'">'+st.lab+'</span>':'<span class="stg sg-wait">加载中</span>';
   var px='—',td='—',ohl='—',amp='—',hsl='—',amt='—';
   if(q&&q.px!=null){
-    px='<b class="px num '+zdfCls(q.zdf)+'">'+fmt(q.px)+'</b>';
+    var d2=/^(sh(5(0|1|2|5|6|8))|sz1)/.test(r.code)?3:2;   // 基金(ETF/LOF)报价 3 位小数，股票 2 位
+    px='<b class="px num '+zdfCls(q.zdf)+'">'+fmt(q.px,d2)+'</b>';
     td=pct(q.zdf);
-    ohl=fmt(q.op)+' / '+fmt(q.hi)+' / '+fmt(q.lo);
+    ohl=fmt(q.op,d2)+' / '+fmt(q.hi,d2)+' / '+fmt(q.lo,d2);
     amp=q.amp!=null?fmt(q.amp,1)+'%':'—';
     hsl=q.hsl!=null?fmt(q.hsl,2)+'%':'—';
     amt=q.amt!=null?(q.amt>=1e4?(q.amt/1e4).toFixed(1)+'亿':q.amt.toFixed(0)+'万'):'—';
