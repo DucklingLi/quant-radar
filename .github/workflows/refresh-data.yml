@@ -62,3 +62,22 @@ jobs:
           cp industry/index.html industry/data.json industry/fallback-data.js deploy/industry/
           cp radar/index.html radar/live.html radar/data.json radar/fallback-data.js \
              radar/MODEL.md radar/MODEL.html radar/prospect.json radar/industry_map.json deploy/radar/
+             
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          publish_branch: gh-pages
+          enable_jekyll: false
+          user_name: data-bot
+          user_email: actions@github.com
+
+
+
+
+
+
+
+
+
