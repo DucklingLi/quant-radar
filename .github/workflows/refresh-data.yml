@@ -51,7 +51,7 @@ jobs:
         run: |
           rm -rf deploy
           mkdir -p deploy/industry deploy/radar
-          cp index.html deploy/
+          cp index.html portfolio.html deploy/
           cp industry/index.html industry/data.json industry/fallback-data.js deploy/industry/
           cp radar/index.html radar/live.html radar/data.json radar/fallback-data.js radar/MODEL.md deploy/radar/
 
