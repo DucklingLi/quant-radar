@@ -204,6 +204,12 @@ tbody td{padding:6px 8px;border-bottom:1px solid var(--line2);text-align:right;w
 .dcard b{color:var(--ink)}
 .dcard .cap{display:flex;gap:6px;align-items:center;font-weight:800;color:var(--ink);font-size:11.5px;margin-bottom:3px}
 .foot{text-align:center;color:var(--mut);font-size:11px;margin-top:13px;line-height:1.8}
+.tabs{display:flex;gap:6px;margin-top:13px;flex-wrap:wrap}
+.tab{border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.07);color:#dbeafe;border-radius:999px;padding:5px 16px;font-size:12.5px;font-weight:600;cursor:pointer;user-select:none}
+.tab:hover{background:rgba(255,255,255,.16)}
+.tab.on{background:#fff;color:#12305c;border-color:#fff;font-weight:800}
+.view-embed{margin:-24px auto 0;padding:0 14px 26px;position:relative;z-index:2}
+.view-embed iframe{width:100%;height:calc(100vh - 78px);border:0;border-radius:14px;background:#fff;display:block;box-shadow:var(--shadow)}
 @media(max-width:1200px){.cards{grid-template-columns:1fr 1fr}.cards .card:first-child{grid-column:1/-1}}
 @media(max-width:980px){.cards{grid-template-columns:1fr}.fuse{grid-template-columns:1fr}.indlist{max-height:340px}}
 @media(max-width:720px){.tlist{grid-template-columns:1fr}.top .rt{width:100%}.pln{flex-wrap:wrap}.pln .rt{margin-left:0}}
@@ -218,13 +224,18 @@ tbody td{padding:6px 8px;border-bottom:1px solid var(--line2);text-align:right;w
       <div class="rt">
         <span class="pill">个股数据 <b id="tRadar">—</b></span>
         <span class="pill">行业数据 <b id="tInd">—</b></span>
-        <a class="pill" href="radar/live.html" style="color:#fecaca;border-color:rgba(248,113,113,.45);background:rgba(248,113,113,.12)">● 实时盯盘</a>
         <a class="pill" href="radar/MODEL.md" style="color:#dbeafe">模型公式 →</a>
       </div>
+    </div>
+    <div class="tabs" id="tabs">
+      <span class="tab on" data-v="home" onclick="goTab('home')">行业 × 个股联动</span>
+      <span class="tab" data-v="pf" onclick="goTab('pf')">实盘交易平台</span>
+      <span class="tab" data-v="live" onclick="goTab('live')">实时盯盘</span>
     </div>
   </div>
 </header>
 
+<div id="vHome">
 <main class="page">
   <div class="warnbar" id="warnbar"></div>
 
@@ -307,6 +318,11 @@ tbody td{padding:6px 8px;border-bottom:1px solid var(--line2);text-align:right;w
   </div>
   <div class="foot">数据源：腾讯财经公开行情接口 · 个股扫描 16:30 后自动更新 · 研究工具，市场有风险，决策需独立判断</div>
 </main>
+</div>
+<div class="view-embed" id="vEmbed" hidden>
+  <iframe id="pfF" data-src="portfolio.html?embed=1" title="实盘交易平台"></iframe>
+  <iframe id="lvF" data-src="radar/live.html?embed=1" title="实时盯盘" style="display:none"></iframe>
+</div>
 
 <script src="radar/fallback-data.js"></script>
 <script>
@@ -489,7 +505,7 @@ function renderDetail(){
   }
   if(!e.mkt){
     h+='<div class="res"><span>该行业在今日执行清单：<b>'+(cnt?cnt+' 只':'0 只')+'</b>'+(cnt?' · 点击下方清单已自动只显示该行业':'（无个股入选今日榜单）')+'</span>'+
-      (cnt?'<span class="btn" onclick="clearIndF()">✕ 返回全榜</span>':'<span class="btn" onclick="location.href=\'radar/live.html\'">● 实时盯盘</span>')+'</div>';
+      (cnt?'<span class="btn" onclick="clearIndF()">✕ 返回全榜</span>':'<span class="btn" onclick="goTab(\'live\')">● 实时盯盘</span>')+'</div>';
   }
   box.innerHTML=h;
   bindDetail(e);
@@ -664,6 +680,19 @@ function renderTagChips(){
     tag=c.dataset.tag;
     el.querySelectorAll('.chip').forEach(function(x){x.classList.remove('on');});
     c.classList.add('on'); renderTable(); }; });
+}
+/* ============ 页签（单页呈现：联动台/交易平台/实时盯盘） ============ */
+function goTab(v){
+  document.querySelectorAll('#tabs .tab').forEach(function(t){ t.classList.toggle('on', t.dataset.v===v); });
+  var home=v==='home', ve=document.getElementById('vEmbed');
+  document.getElementById('vHome').style.display=home?'':'none';
+  ve.hidden=home;
+  var pf=document.getElementById('pfF'), lv=document.getElementById('lvF');
+  pf.style.display=(v==='pf')?'block':'none';
+  lv.style.display=(v==='live')?'block':'none';
+  if(v==='pf'&&!pf.getAttribute('src')) pf.setAttribute('src',pf.getAttribute('data-src'));
+  if(v==='live'&&!lv.getAttribute('src')) lv.setAttribute('src',lv.getAttribute('data-src'));
+  window.scrollTo(0,0);
 }
 /* ============ 启动 ============ */
 loadAll();
