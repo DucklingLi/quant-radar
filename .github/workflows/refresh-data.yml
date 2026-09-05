@@ -7,8 +7,10 @@ name: daily-scan
 # 流程：
 #   1) industry/  行业低位雷达：抓行情 -> data.json
 #   2) radar/     多因子雷达：全市场扫描打分 -> data.json
-#   3) 数据有变化则提交回 main
-#   4) 站点整体（首页 + industry/ + radar/）发布到 gh-pages
+#   3) radar/     前瞻绩效：读 git 历史榜单快照，满 20/60 交易日后
+#                  自动评估当时 Top 的真实命中（prospect.json）
+#   4) 数据有变化则提交回 main
+#   5) 站点整体（首页 + industry/ + radar/）发布到 gh-pages
 # 站点结构：
 #   /quant-radar/             导航首页
 #   /quant-radar/industry/    行业低位雷达 · 量化行业筛选
@@ -27,19 +29,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # 完整历史：prospect_track 需要读取历史榜单快照
 
-      - name: "Step 1/4: industry data update"
+      - name: "Step 1/5: industry data update"
         run: cd industry && python scripts/update.py
 
-      - name: "Step 2/4: radar full-market scan"
+      - name: "Step 2/5: radar full-market scan"
         run: cd radar && python scripts/scan.py
 
-      - name: "Step 3/4: commit data if changed"
+      - name: "Step 3/5: prospect evaluate (read-only vs history)"
+        run: cd radar && python scripts/prospect_track.py
+
+      - name: "Step 4/5: commit data if changed"
         run: |
           git config user.name "data-bot"
           git config user.email "actions@github.com"
           git add industry/data.json industry/fallback-data.js \
-                  radar/data.json radar/fallback-data.js
+                  radar/data.json radar/fallback-data.js radar/prospect.json
           if git diff --cached --quiet; then
             echo "No data change."
           else
@@ -47,20 +54,11 @@ jobs:
             git push
           fi
 
-      - name: "Step 4/4: stage publish files"
+      - name: "Step 5/5: stage publish files"
         run: |
           rm -rf deploy
           mkdir -p deploy/industry deploy/radar
           cp index.html portfolio.html deploy/
           cp industry/index.html industry/data.json industry/fallback-data.js deploy/industry/
-          cp radar/index.html radar/live.html radar/data.json radar/fallback-data.js radar/MODEL.md deploy/radar/
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./deploy
-          publish_branch: gh-pages
-          enable_jekyll: false
-          user_name: data-bot
-          user_email: actions@github.com
+          cp radar/index.html radar/live.html radar/data.json radar/fallback-data.js \
+             radar/MODEL.md radar/MODEL.html radar/prospect.json radar/industry_map.json deploy/radar/
