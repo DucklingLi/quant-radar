@@ -26,6 +26,11 @@ a{color:var(--blue);text-decoration:none}
 .stat .dot{width:8px;height:8px;border-radius:50%;background:#94a3b8}
 .dot.on{background:#4ade80}
 .top .rt{margin-left:auto;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+/* 嵌入(页签)模式：只隐藏品牌标题与站内跳转，保留行情状态 + ⟳行情/⬇导出/⬆导入 操作按钮 */
+body.embed .top{padding:8px 14px;gap:8px;border-radius:0 0 10px 10px;position:static}
+body.embed .top h1,body.embed .top a{display:none}
+body.embed .stat{font-size:11px;padding:2px 9px}
+body.embed .top .rt button{padding:3px 10px;font-size:12px}
 button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 11px;font-size:12.5px;cursor:pointer;color:var(--sub);font-family:inherit}
 button:hover{border-color:#c7d2fe;color:var(--blue)}
 button.pri{background:var(--blued);border-color:var(--blued);color:#fff;font-weight:700}
@@ -80,7 +85,7 @@ tr.warn{background:#fffbeb}
 </style>
 </head>
 <body>
-<script>document.addEventListener("DOMContentLoaded",function(){if(location.search.indexOf("embed")>=0){var el=document.querySelector(".top");if(el)el.style.display="none";}});</script>
+<script>document.addEventListener("DOMContentLoaded",function(){if(location.search.indexOf("embed")>=0){document.body.classList.add("embed");}});</script>
 <div class="top">
   <h1><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M3 17l5-6 4 3 6-8"/><path d="M15 6h4v4"/></svg>一站式交易平台<span class="t">REAL</span></h1>
   <span class="stat"><span class="dot" id="qtDot"></span>行情 <b id="qtTxt">连接中…</b></span>
@@ -346,8 +351,8 @@ function importBook(){
     var rd=new FileReader();
     rd.onload=function(){ try{
       var o=JSON.parse(rd.result);
-      if(o&&typeof o==='object'&&(o.positions||Array.isArray(o))){ BK=scrubBook(o); }
-      else if(Array.isArray(o)){ BK=scrubBook({cash:556.2,positions:o,trades:[]}); }
+      if(Array.isArray(o)){ BK=scrubBook({cash:556.2,positions:o,trades:[]}); }            // 纯持仓数组（导入文件为此格式）
+      else if(o&&typeof o==='object'&&Array.isArray(o.positions)){ BK=scrubBook(o); }      // 完整账本对象（导出/备份格式）
       else throw 0;
       saveBK(); renderAll(); refreshQuotes(); alert('导入完成：'+BK.positions.length+' 笔持仓 / 现金 ¥'+BK.cash.toFixed(2)+'（无效条目已自动跳过）'); }
       catch(e){ alert('文件格式不对'); } };
